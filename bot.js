@@ -53,10 +53,6 @@ const cards = [
         number: '6262 5700 7941 9950',
         owner: 'Ganiyev G'
     },
-    {
-        number: '4073 4200 4305 2962',
-        owner: 'Mamajonov M'
-    },
 ];
 
 const userStates = {};
