@@ -1,11 +1,3 @@
-const TelegramBot = require('node-telegram-bot-api');
-
-const token = '8698364994:AAFZNoMTzFzVMFoTKQRrWyR1xfsX3pWP9_Y';
-const adminId = 6964373903;
-
-const bot = new TelegramBot(token, { polling: true });
-
-console.log('Bot ishlayapti...');
 const express = require("express");
 const TelegramBot = require("node-telegram-bot-api");
 
@@ -13,7 +5,9 @@ const app = express();
 
 const token = process.env.BOT_TOKEN;
 
-const bot = new TelegramBot(token, { polling: true });
+const bot = new TelegramBot(token, {
+    polling: true
+});
 
 bot.on("message", (msg) => {
     bot.sendMessage(msg.chat.id, "Salom");
@@ -26,7 +20,7 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log("Server running on port " + PORT);
+    console.log(`Server running on ${PORT}`);
 });
 
 // ======================
