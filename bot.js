@@ -4,28 +4,36 @@ const TelegramBot = require("node-telegram-bot-api");
 const app = express();
 
 // ======================
-// ENV
+// ENV CHECK
 // ======================
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const adminId = process.env.ADMIN_ID;
 
+console.log("BOT STARTING...");
+console.log("TOKEN EXISTS:", !!token);
+console.log("ADMIN_ID:", adminId);
+
 if (!token) {
-    throw new Error("TELEGRAM_BOT_TOKEN is missing in environment variables!");
+    throw new Error("❌ TELEGRAM_BOT_TOKEN is missing in environment variables!");
 }
 
 if (!adminId) {
-    throw new Error("ADMIN_ID is missing in environment variables!");
+    throw new Error("❌ ADMIN_ID is missing in environment variables!");
 }
 
 // ======================
-// BOT
+// BOT INIT
 // ======================
 const bot = new TelegramBot(token, {
     polling: true
 });
 
+bot.on("polling_error", (error) => {
+    console.log("❌ POLLING ERROR:", error?.response?.body || error.message);
+});
+
 // ======================
-// EXPRESS
+// EXPRESS SERVER
 // ======================
 app.get("/", (req, res) => {
     res.send("Bot ishlayapti");
@@ -38,19 +46,19 @@ app.listen(PORT, () => {
 });
 
 // ======================
-// KARTALAR
+// DATA
 // ======================
 const cards = [
     {
         number: '6262 5700 7941 9950',
         owner: 'Ganiyev G'
     },
-
+    {
+        number: '4073 4200 4305 2962',
+        owner: 'Mamajonov M'
+    },
 ];
 
-// ======================
-// USER STATES
-// ======================
 const userStates = {};
 
 // ======================
@@ -87,8 +95,11 @@ bot.onText(/\/start/, (msg) => {
 // ======================
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
+    const text = msg.text;
 
-    if (msg.text === '/start') return;
+    if (!text) return;
+
+    if (text === '/start') return;
 
     if (chatId == adminId) return;
 
@@ -101,61 +112,36 @@ bot.on('message', async (msg) => {
     // ======================
     // MAIN MENU
     // ======================
-    if (msg.text === '💳 Hisobni to‘ldirish') {
+    if (text === '💳 Hisobni to‘ldirish') {
         state.step = 'deposit_id';
 
         return bot.sendMessage(chatId,
-`1xBet ID raqamingizni yuboring.
-
-⚠️ Diqqat:
-ID noto‘g‘ri bo‘lsa, mablag‘ boshqa hisobga tushadi.`,
-        {
-            reply_markup: {
-                keyboard: [['🔙 Asosiy menyu']],
-                resize_keyboard: true
-            }
-        });
+`1xBet ID yuboring.`
+        );
     }
 
-    if (msg.text === '💸 Pul yechish') {
+    if (text === '💸 Pul yechish') {
         state.step = 'withdraw_screenshot';
 
         return bot.sendMessage(chatId,
-`1xBet pul yechish bo‘limiga kiring.
-
-📍 Chust / ZEUS (24/7)
-
-Screenshot yuboring.`,
-        {
-            reply_markup: {
-                keyboard: [['🔙 Asosiy menyu']],
-                resize_keyboard: true
-            }
-        });
+`Screenshot yuboring.`
+        );
     }
 
-    if (msg.text === '🛠 Support') {
+    if (text === '🛠 Support') {
         state.step = 'support';
 
         return bot.sendMessage(chatId,
-`Muammo yozing.`,
-        {
-            reply_markup: {
-                keyboard: [
-                    ['📞 Operator kontakti'],
-                    ['🔙 Asosiy menyu']
-                ],
-                resize_keyboard: true
-            }
-        });
+`Xabaringizni yozing.`
+        );
     }
 
-    if (msg.text === '🔙 Asosiy menyu') {
+    if (text === '🔙 Asosiy menyu') {
         userStates[chatId] = {};
         return mainMenu(chatId);
     }
 
-    if (msg.text === '📞 Operator kontakti') {
+    if (text === '📞 Operator kontakti') {
         return bot.sendMessage(chatId, 'Operator: @Kassa_1xbt');
     }
 
@@ -163,14 +149,14 @@ Screenshot yuboring.`,
     // DEPOSIT FLOW
     // ======================
     if (state.step === 'deposit_id') {
-        state.betId = msg.text;
+        state.betId = text;
         state.step = 'deposit_amount';
 
         return bot.sendMessage(chatId, 'Summani kiriting.');
     }
 
     if (state.step === 'deposit_amount') {
-        state.amount = msg.text;
+        state.amount = text;
         state.step = 'deposit_screenshot';
 
         const randomCard = cards[Math.floor(Math.random() * cards.length)];
@@ -180,7 +166,8 @@ Screenshot yuboring.`,
 `💳 ${randomCard.number}
 👤 ${randomCard.owner}
 
-Screenshot yuboring.`);
+Screenshot yuboring.`
+        );
     }
 
     if (state.step === 'deposit_screenshot') {
@@ -203,8 +190,8 @@ Karta: ${state.card.number}`,
             reply_markup: {
                 inline_keyboard: [
                     [
-                        { text: '✅ Tasdiqlash', callback_data: `approveDeposit_${chatId}` },
-                        { text: '❌ Bekor qilish', callback_data: `rejectDeposit_${chatId}` }
+                        { text: '✅ OK', callback_data: `approveDeposit_${chatId}` },
+                        { text: '❌ NO', callback_data: `rejectDeposit_${chatId}` }
                     ]
                 ]
             }
@@ -212,7 +199,7 @@ Karta: ${state.card.number}`,
 
         userStates[chatId] = {};
 
-        return bot.sendMessage(chatId, '⏳ Tekshirilmoqda...');
+        return bot.sendMessage(chatId, '⏳ Qabul qilindi');
     }
 
     // ======================
@@ -226,11 +213,11 @@ Karta: ${state.card.number}`,
         state.withdrawPhoto = msg.photo[msg.photo.length - 1].file_id;
         state.step = 'withdraw_card';
 
-        return bot.sendMessage(chatId, 'Karta raqam kiriting.');
+        return bot.sendMessage(chatId, 'Karta raqam yuboring.');
     }
 
     if (state.step === 'withdraw_card') {
-        state.cardNumber = msg.text;
+        state.cardNumber = text;
 
         bot.sendPhoto(adminId, state.withdrawPhoto, {
             caption:
@@ -243,8 +230,8 @@ Karta: ${state.card.number}`,
             reply_markup: {
                 inline_keyboard: [
                     [
-                        { text: '✅ To‘landi', callback_data: `approveWithdraw_${chatId}` },
-                        { text: '❌ Bekor qilish', callback_data: `rejectWithdraw_${chatId}` }
+                        { text: '✅ Paid', callback_data: `approveWithdraw_${chatId}` },
+                        { text: '❌ Cancel', callback_data: `rejectWithdraw_${chatId}` }
                     ]
                 ]
             }
@@ -265,7 +252,7 @@ Karta: ${state.card.number}`,
 👤 ${msg.from.first_name}
 🆔 ${chatId}
 
-${msg.text}`);
+${text}`);
 
         return bot.sendMessage(chatId, 'Yuborildi');
     }
@@ -279,7 +266,7 @@ bot.on('callback_query', (query) => {
 
     if (data.startsWith('approveDeposit_')) {
         const userId = data.split('_')[1];
-        bot.sendMessage(userId, '✅ Top up confirmed');
+        bot.sendMessage(userId, '✅ Approved');
     }
 
     if (data.startsWith('rejectDeposit_')) {
