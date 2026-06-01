@@ -341,34 +341,39 @@ bot.on('callback_query', async (query) => {
     const data = query.data;
 
     if (data.startsWith('approveDeposit_')) {
-    const userId = data.split('_')[1];
+        const userId = data.split('_')[1];
 
-    bot.sendMessage(userId,
+        bot.sendMessage(userId,
 `✅ To‘lov tasdiqlandi.
 
 💰 Mablag‘ hisobingizga muvaffaqiyatli tushirildi.
 
 O‘yinlarda omad tilaymiz!`);
-}
+    }
 
-if (data.startsWith('rejectDeposit_')) {
-    const userId = data.split('_')[1];
+    if (data.startsWith('rejectDeposit_')) {
+        const userId = data.split('_')[1];
 
-    bot.sendMessage(userId,
+        bot.sendMessage(userId,
 `❌ To‘lov tasdiqlanmadi.
 
 Iltimos chekni qayta tekshirib yuboring yoki operator bilan bog‘laning.`);
-}
     }
 
     if (data.startsWith('approveWithdraw_')) {
         const userId = data.split('_')[1];
-        bot.sendMessage(userId, '✅ Kartangizga pul muvaffaqiyatli yuborildi.');
+
+        bot.sendMessage(userId,
+`✅ Kartangizga pul muvaffaqiyatli yuborildi.`);
     }
 
     if (data.startsWith('rejectWithdraw_')) {
         const userId = data.split('_')[1];
-        bot.sendMessage(userId, '❌ So‘rov bekor qilindi. Pul kassamizga yechilmagan yoki kod noto‘g‘ri bo‘lishi mumkin!');
+
+        bot.sendMessage(userId,
+`❌ So‘rov bekor qilindi.
+
+Pul kassamizga yechilmagan yoki kod noto‘g‘ri bo‘lishi mumkin!`);
     }
 
     bot.answerCallbackQuery(query.id);
