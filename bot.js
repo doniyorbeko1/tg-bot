@@ -26,6 +26,26 @@ if (!adminId) {
 // ======================
 const bot = new TelegramBot(token, { polling: true });
 
+bot.getMe()
+    .then(me => {
+        console.log("BOT CONNECTED:", me.username);
+    })
+    .catch(err => {
+        console.error("BOT START ERROR:", err);
+    });
+
+bot.on("polling_error", (err) => {
+    console.error("POLLING ERROR:", err);
+});
+
+bot.on("error", (err) => {
+    console.error("BOT ERROR:", err);
+});
+
+bot.on("webhook_error", (err) => {
+    console.error("WEBHOOK ERROR:", err);
+});
+
 bot.on("polling_error", (err) => {
     console.log("POLLING ERROR:", err?.message || err);
 });
@@ -36,6 +56,24 @@ bot.on("polling_error", (err) => {
 app.get("/", (req, res) => {
     res.send("Bot ishlayapti");
 });
+
+// ======================
+// KEEP ALIVE
+// ======================
+
+setInterval(async () => {
+    try {
+        const me = await bot.getMe();
+        console.log(
+            `[${new Date().toISOString()}] BOT OK: @${me.username}`
+        );
+    } catch (e) {
+        console.error(
+            `[${new Date().toISOString()}] BOT DEAD:`,
+            e.message
+        );
+    }
+}, 60000);
 
 const PORT = process.env.PORT || 3000;
 
@@ -100,10 +138,6 @@ bot.onText(/\/start/, (msg) => {
 
     userStates[msg.chat.id] = {};
 
-    bot.sendMessage(msg.chat.id,
-        'Assalomu alaykum!'
-    );
-
     if (msg.chat.id == adminId) {
         return adminMenu(msg.chat.id);
     }
@@ -129,6 +163,10 @@ bot.on('message', async (msg) => {
 
     // USERS SAVE
     users.add(chatId);
+
+    console.log(
+    `[USER] ${chatId} | ${msg.from.first_name || "Unknown"} | ${text}`
+);
 
     // ======================
     // ADMIN
@@ -454,5 +492,9 @@ Iltimos chekni qayta tekshirib yuboring yoki operator bilan bog‘laning.`);
 Pul kassamizga yechilmagan yoki kod noto‘g‘ri bo‘lishi mumkin!`);
     }
 
-    bot.answerCallbackQuery(query.id);
+    try {
+    await bot.answerCallbackQuery(query.id);
+} catch (e) {
+    console.error("Callback error:", e.message);
+}
 });
