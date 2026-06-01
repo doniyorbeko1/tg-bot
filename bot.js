@@ -113,50 +113,51 @@ bot.onText(/\/start/, (msg) => {
 // ======================
 // MESSAGE HANDLER (YOUR LOGIC)
 // ======================
-bot.on('message' users.add(chatId);, async (msg) => {
+bot.on('message', async (msg) => {
     
     const chatId = msg.chat.id;
     const text = msg.text || '';
 
     if (text === '/start') return;
 
-
     if (!userStates[chatId]) {
         userStates[chatId] = {};
     }
 
     const state = userStates[chatId];
+
     if (chatId == adminId) {
 
-    if (text === '📊 Foydalanuvchilar soni') {
-        return bot.sendMessage(chatId,
-            `👥 Foydalanuvchilar soni: ${users.size}`);
-    }
-
-    if (text === '📢 Barchaga e\'lon yuborish') {
-        state.step = 'broadcast';
-
-        return bot.sendMessage(chatId,
-            'Yubormoqchi bo‘lgan e\'lon matnini kiriting:');
-    }
-
-    if (state.step === 'broadcast') {
-
-        let success = 0;
-
-        for (const userId of users) {
-            try {
-                await bot.sendMessage(userId, text);
-                success++;
-            } catch (e) {}
+        if (text === '📊 Foydalanuvchilar soni') {
+            return bot.sendMessage(chatId,
+                `👥 Foydalanuvchilar soni: ${users.size}`);
         }
 
-        state.step = null;
+        if (text === '📢 Barchaga e\'lon yuborish') {
+            state.step = 'broadcast';
 
-        return bot.sendMessage(chatId,
-            `✅ Xabar ${success} ta foydalanuvchiga yuborildi.`);
+            return bot.sendMessage(chatId,
+                'Yubormoqchi bo‘lgan e\'lon matnini kiriting:');
+        }
+
+        if (state.step === 'broadcast') {
+
+            let success = 0;
+
+            for (const userId of users) {
+                try {
+                    await bot.sendMessage(userId, text);
+                    success++;
+                } catch (e) {}
+            }
+
+            state.step = null;
+
+            return bot.sendMessage(chatId,
+                `✅ Xabar ${success} ta foydalanuvchiga yuborildi.`);
+        }
     }
-}
+});
 
     // ======================
     // MAIN MENU (UNCHANGED TEXTS)
