@@ -341,24 +341,55 @@ bot.on('callback_query', async (query) => {
     const data = query.data;
 
     if (data.startsWith('approveDeposit_')) {
-        const userId = data.split('_')[1];
+    const userId = data.split('_')[1];
 
-        bot.sendMessage(userId,
+    await bot.editMessageReplyMarkup(
+        { inline_keyboard: [] },
+        {
+            chat_id: query.message.chat.id,
+            message_id: query.message.message_id
+        }
+    );
+
+    await bot.editMessageCaption(
+        query.message.caption + "\n\n✅ TASDIQLANDI",
+        {
+            chat_id: query.message.chat.id,
+            message_id: query.message.message_id
+        }
+    );
+
+    bot.sendMessage(userId,
 `✅ To‘lov tasdiqlandi.
 
 💰 Mablag‘ hisobingizga muvaffaqiyatli tushirildi.
 
 O‘yinlarda omad tilaymiz!`);
-    }
-
+}
     if (data.startsWith('rejectDeposit_')) {
-        const userId = data.split('_')[1];
+    const userId = data.split('_')[1];
 
-        bot.sendMessage(userId,
+    await bot.editMessageReplyMarkup(
+        { inline_keyboard: [] },
+        {
+            chat_id: query.message.chat.id,
+            message_id: query.message.message_id
+        }
+    );
+
+    await bot.editMessageCaption(
+        query.message.caption + "\n\n❌ RAD ETILDI",
+        {
+            chat_id: query.message.chat.id,
+            message_id: query.message.message_id
+        }
+    );
+
+    bot.sendMessage(userId,
 `❌ To‘lov tasdiqlanmadi.
 
 Iltimos chekni qayta tekshirib yuboring yoki operator bilan bog‘laning.`);
-    }
+}
 
     if (data.startsWith('approveWithdraw_')) {
         const userId = data.split('_')[1];
