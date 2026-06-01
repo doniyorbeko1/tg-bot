@@ -148,7 +148,7 @@ Chust
 ZEUS (24/7)
 
 ⚠️ Muhim:
-Kassada berilgan maxsus kod screenshotda ko‘rinishi shart.
+Kassada berilgan maxsus kod va 1xbet mahsus ID-iz screenshotda ko‘rinishi shart.
 
 Screenshotni yuboring.`,
         {
