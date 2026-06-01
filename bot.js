@@ -44,14 +44,13 @@ app.listen(PORT, () => {
 });
 
 // ======================
-// KARTALAR (YOUR ORIGINAL)
+// KARTALAR
 // ======================
 const cards = [
     {
         number: '6262 5700 7941 9950',
         owner: 'Ganiyev G'
     },
-
 ];
 
 // ======================
@@ -61,7 +60,7 @@ const userStates = {};
 const users = new Set();
 
 // ======================
-// MENU (YOUR TEXTS)
+// MENU
 // ======================
 function adminMenu(chatId) {
     bot.sendMessage(chatId,
@@ -77,8 +76,8 @@ function adminMenu(chatId) {
         }
     );
 }
-function mainMenu(chatId) {
 
+function mainMenu(chatId) {
     bot.sendMessage(chatId,
         'Kerakli bo‘limni tanlang:',
         {
@@ -104,17 +103,19 @@ bot.onText(/\/start/, (msg) => {
     bot.sendMessage(msg.chat.id,
         'Assalomu alaykum!'
     );
+
     if (msg.chat.id == adminId) {
-    return adminMenu(msg.chat.id);
-}
+        return adminMenu(msg.chat.id);
+    }
+
     mainMenu(msg.chat.id);
 });
 
 // ======================
-// MESSAGE HANDLER (YOUR LOGIC)
+// MESSAGE HANDLER
 // ======================
 bot.on('message', async (msg) => {
-    
+
     const chatId = msg.chat.id;
     const text = msg.text || '';
 
@@ -126,6 +127,12 @@ bot.on('message', async (msg) => {
 
     const state = userStates[chatId];
 
+    // USERS SAVE
+    users.add(chatId);
+
+    // ======================
+    // ADMIN
+    // ======================
     if (chatId == adminId) {
 
         if (text === '📊 Foydalanuvchilar soni') {
@@ -157,10 +164,9 @@ bot.on('message', async (msg) => {
                 `✅ Xabar ${success} ta foydalanuvchiga yuborildi.`);
         }
     }
-});
 
     // ======================
-    // MAIN MENU (UNCHANGED TEXTS)
+    // MAIN MENU
     // ======================
 
     if (text === '💳 Hisobni to‘ldirish') {
@@ -236,7 +242,7 @@ Operator tez orada siz bilan bog‘lanadi.`,
     }
 
     // ======================
-    // DEPOSIT FLOW (YOUR TEXTS)
+    // DEPOSIT FLOW
     // ======================
 
     if (state.step === 'deposit_id') {
@@ -259,8 +265,7 @@ Operator tez orada siz bilan bog‘lanadi.`,
 💳 ${randomCard.number}
 👤 ${randomCard.owner}
 
-To‘lov qilgandan so‘ng screenshot yuboring.`
-        );
+To‘lov qilgandan so‘ng screenshot yuboring.`);
     }
 
     if (state.step === 'deposit_screenshot') {
@@ -299,17 +304,17 @@ ${state.card.number}`,
         userStates[chatId] = {};
 
         return bot.sendMessage(chatId,
-    `✅ To‘lov cheki qabul qilindi.
+`✅ To‘lov cheki qabul qilindi.
 
-    ⏳ Operator tomonidan tekshirilmoqda.
+⏳ Operator tomonidan tekshirilmoqda.
 
-    🕐 Odatda 5–10 daqiqa ichida ko‘rib chiqiladi.
+🕐 Odatda 5–10 daqiqa ichida ko‘rib chiqiladi.
 
-    Tasdiqlangandan so‘ng mablag‘ hisobingizga tushiriladi.`);
+Tasdiqlangandan so‘ng mablag‘ hisobingizga tushiriladi.`);
     }
 
     // ======================
-    // WITHDRAW FLOW (YOUR TEXTS)
+    // WITHDRAW FLOW
     // ======================
 
     if (state.step === 'withdraw_screenshot') {
@@ -360,7 +365,7 @@ Tasdiqlangandan so‘ng 5–10 daqiqa ichida mablag‘ kartangizga tushadi.`);
     }
 
     // ======================
-    // SUPPORT (YOUR TEXTS)
+    // SUPPORT
     // ======================
 
     if (state.step === 'support') {
@@ -375,13 +380,12 @@ Tasdiqlangandan so‘ng 5–10 daqiqa ichida mablag‘ kartangizga tushadi.`);
 ${text}`);
 
         return bot.sendMessage(chatId,
-            '✅ Xabaringiz operatorga yuborildi.'
-        );
+            '✅ Xabaringiz operatorga yuborildi.');
     }
 });
 
 // ======================
-// CALLBACKS (UNCHANGED LOGIC)
+// CALLBACKS
 // ======================
 
 bot.on('callback_query', async (query) => {
@@ -389,55 +393,50 @@ bot.on('callback_query', async (query) => {
     const data = query.data;
 
     if (data.startsWith('approveDeposit_')) {
-    const userId = data.split('_')[1];
+        const userId = data.split('_')[1];
 
-    await bot.editMessageReplyMarkup(
-        { inline_keyboard: [] },
-        {
+        await bot.editMessageReplyMarkup({ inline_keyboard: [] }, {
             chat_id: query.message.chat.id,
             message_id: query.message.message_id
-        }
-    );
+        });
 
-    await bot.editMessageCaption(
-        query.message.caption + "\n\n✅ TASDIQLANDI",
-        {
-            chat_id: query.message.chat.id,
-            message_id: query.message.message_id
-        }
-    );
+        await bot.editMessageCaption(
+            query.message.caption + "\n\n✅ TASDIQLANDI",
+            {
+                chat_id: query.message.chat.id,
+                message_id: query.message.message_id
+            }
+        );
 
-    bot.sendMessage(userId,
+        bot.sendMessage(userId,
 `✅ To‘lov tasdiqlandi.
 
 💰 Mablag‘ hisobingizga muvaffaqiyatli tushirildi.
 
 O‘yinlarda omad tilaymiz!`);
-}
+    }
+
     if (data.startsWith('rejectDeposit_')) {
-    const userId = data.split('_')[1];
+        const userId = data.split('_')[1];
 
-    await bot.editMessageReplyMarkup(
-        { inline_keyboard: [] },
-        {
+        await bot.editMessageReplyMarkup({ inline_keyboard: [] }, {
             chat_id: query.message.chat.id,
             message_id: query.message.message_id
-        }
-    );
+        });
 
-    await bot.editMessageCaption(
-        query.message.caption + "\n\n❌ RAD ETILDI",
-        {
-            chat_id: query.message.chat.id,
-            message_id: query.message.message_id
-        }
-    );
+        await bot.editMessageCaption(
+            query.message.caption + "\n\n❌ RAD ETILDI",
+            {
+                chat_id: query.message.chat.id,
+                message_id: query.message.message_id
+            }
+        );
 
-    bot.sendMessage(userId,
+        bot.sendMessage(userId,
 `❌ To‘lov tasdiqlanmadi.
 
 Iltimos chekni qayta tekshirib yuboring yoki operator bilan bog‘laning.`);
-}
+    }
 
     if (data.startsWith('approveWithdraw_')) {
         const userId = data.split('_')[1];
