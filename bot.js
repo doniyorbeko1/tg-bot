@@ -58,10 +58,25 @@ const cards = [
 // USER STATES
 // ======================
 const userStates = {};
+const users = new Set();
 
 // ======================
 // MENU (YOUR TEXTS)
 // ======================
+function adminMenu(chatId) {
+    bot.sendMessage(chatId,
+        '🔐 Admin panel',
+        {
+            reply_markup: {
+                keyboard: [
+                    ['📢 Barchaga e\'lon yuborish'],
+                    ['📊 Foydalanuvchilar soni']
+                ],
+                resize_keyboard: true
+            }
+        }
+    );
+}
 function mainMenu(chatId) {
 
     bot.sendMessage(chatId,
@@ -89,27 +104,59 @@ bot.onText(/\/start/, (msg) => {
     bot.sendMessage(msg.chat.id,
         'Assalomu alaykum!'
     );
-
+    if (msg.chat.id == adminId) {
+    return adminMenu(msg.chat.id);
+}
     mainMenu(msg.chat.id);
 });
 
 // ======================
 // MESSAGE HANDLER (YOUR LOGIC)
 // ======================
-bot.on('message', async (msg) => {
-
+bot.on('message' users.add(chatId);, async (msg) => {
+    
     const chatId = msg.chat.id;
     const text = msg.text || '';
 
     if (text === '/start') return;
 
-    if (chatId == adminId) return;
 
     if (!userStates[chatId]) {
         userStates[chatId] = {};
     }
 
     const state = userStates[chatId];
+    if (chatId == adminId) {
+
+    if (text === '📊 Foydalanuvchilar soni') {
+        return bot.sendMessage(chatId,
+            `👥 Foydalanuvchilar soni: ${users.size}`);
+    }
+
+    if (text === '📢 Barchaga e\'lon yuborish') {
+        state.step = 'broadcast';
+
+        return bot.sendMessage(chatId,
+            'Yubormoqchi bo‘lgan e\'lon matnini kiriting:');
+    }
+
+    if (state.step === 'broadcast') {
+
+        let success = 0;
+
+        for (const userId of users) {
+            try {
+                await bot.sendMessage(userId, text);
+                success++;
+            } catch (e) {}
+        }
+
+        state.step = null;
+
+        return bot.sendMessage(chatId,
+            `✅ Xabar ${success} ta foydalanuvchiga yuborildi.`);
+    }
+}
 
     // ======================
     // MAIN MENU (UNCHANGED TEXTS)
