@@ -99,9 +99,8 @@ bot.onText(/\/start/, (msg) => {
 bot.on('message', async (msg) => {
 
     const chatId = msg.chat.id;
-    const text = msg.text;
+    const text = msg.text || '';
 
-    if (!text) return;
     if (text === '/start') return;
 
     if (chatId == adminId) return;
@@ -252,9 +251,13 @@ ${state.card.number}`,
         userStates[chatId] = {};
 
         return bot.sendMessage(chatId,
-`⏳ Screenshot qabul qilindi.
+    `✅ To‘lov cheki qabul qilindi.
 
-Operator tekshirib bo'lgach hisobingiz to‘ldiriladi.`);
+    ⏳ Operator tomonidan tekshirilmoqda.
+
+    🕐 Odatda 5–10 daqiqa ichida ko‘rib chiqiladi.
+
+    Tasdiqlangandan so‘ng mablag‘ hisobingizga tushiriladi.`);
     }
 
     // ======================
@@ -338,13 +341,24 @@ bot.on('callback_query', async (query) => {
     const data = query.data;
 
     if (data.startsWith('approveDeposit_')) {
-        const userId = data.split('_')[1];
-        bot.sendMessage(userId, '✅ Hisobingiz muvaffaqiyatli to‘ldirildi.');
-    }
+    const userId = data.split('_')[1];
 
-    if (data.startsWith('rejectDeposit_')) {
-        const userId = data.split('_')[1];
-        bot.sendMessage(userId, '❌ To‘lov tasdiqlanmadi.');
+    bot.sendMessage(userId,
+`✅ To‘lov tasdiqlandi.
+
+💰 Mablag‘ hisobingizga muvaffaqiyatli tushirildi.
+
+O‘yinlarda omad tilaymiz!`);
+}
+
+if (data.startsWith('rejectDeposit_')) {
+    const userId = data.split('_')[1];
+
+    bot.sendMessage(userId,
+`❌ To‘lov tasdiqlanmadi.
+
+Iltimos chekni qayta tekshirib yuboring yoki operator bilan bog‘laning.`);
+}
     }
 
     if (data.startsWith('approveWithdraw_')) {
