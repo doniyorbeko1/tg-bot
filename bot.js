@@ -229,10 +229,17 @@ ID raqamni noto‘g‘ri yuborsangiz, mablag‘ boshqa hisobga tushib ketishi mu
     state.step = 'withdraw_id';
 
     return bot.sendMessage(chatId,
-`1xBet ID raqamingizni yuboring.
+`1xBet platformasida pul chiqarish bo‘limiga kiring.
 
-⚠️ Diqqat:
-ID raqamni noto‘g‘ri yuborsangiz, mablag‘ yechilmaydi.`,
+🏦 Nalichniye (1xBet logosi bilan)
+
+📍 Shahar:
+Chust
+
+📍 Manzil:
+ZEUS (24/7)
+
+🔐 Keyin 1xBet ID raqamingizni yuboring.`,
 {
     reply_markup: {
         keyboard: [['🔙 Asosiy menyu']],
