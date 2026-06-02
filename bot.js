@@ -226,30 +226,20 @@ ID raqamni noto‘g‘ri yuborsangiz, mablag‘ boshqa hisobga tushib ketishi mu
 
     if (text === '💸 Pul yechish') {
 
-        state.step = 'withdraw_screenshot';
+    state.step = 'withdraw_id';
 
-        return bot.sendMessage(chatId,
-`1xBet platformasida pul chiqarish bo‘limiga kiring.
+    return bot.sendMessage(chatId,
+`1xBet ID raqamingizni yuboring.
 
-🏦 Nalichniye (1xBet logosi bilan)
-
-📍 Shahar:
-Chust
-
-📍 Manzil:
-ZEUS (24/7)
-
-⚠️ Muhim:
-Kassada berilgan maxsus kod va 1xbet mahsus ID-iz screenshotda ko‘rinishi shart.
-
-Screenshotni yuboring.`,
-        {
-            reply_markup: {
-                keyboard: [['🔙 Asosiy menyu']],
-                resize_keyboard: true
-            }
-        });
+⚠️ Diqqat:
+ID raqamni noto‘g‘ri yuborsangiz, mablag‘ yechilmaydi.`,
+{
+    reply_markup: {
+        keyboard: [['🔙 Asosiy menyu']],
+        resize_keyboard: true
     }
+});
+}
 
     if (text === '🛠 Support') {
 
@@ -355,53 +345,54 @@ Tasdiqlangandan so‘ng mablag‘ hisobingizga tushiriladi.`);
     // WITHDRAW FLOW
     // ======================
 
-    if (state.step === 'withdraw_screenshot') {
+if (state.step === 'withdraw_id') {
 
-        if (!msg.photo) {
-            return bot.sendMessage(chatId, 'Iltimos screenshot yuboring.');
-        }
+    state.betId = text;
+    state.step = 'withdraw_code';
 
-        state.withdrawPhoto = msg.photo[msg.photo.length - 1].file_id;
-        state.step = 'withdraw_card';
+    return bot.sendMessage(chatId,
+`Kassada berilgan maxsus kodni yuboring.`);
+}
 
-        return bot.sendMessage(chatId,
-`Karta raqamingizni yuboring.
+if (state.step === 'withdraw_code') {
 
-⚠️ Diqqat:
-Karta raqamni noto‘g‘ri yuborsangiz, mablag‘ boshqa kartaga tushib ketishi mumkin.`);
-    }
+    state.cashCode = text;
 
-    if (state.step === 'withdraw_card') {
-
-        state.cardNumber = text;
-
-        bot.sendPhoto(adminId, state.withdrawPhoto, {
-            caption:
+    bot.sendMessage(adminId,
 `💸 Pul yechish so‘rovi
 
 👤 ${msg.from.first_name}
 🆔 ${chatId}
 
-💳 Karta:
-${state.cardNumber}`,
-            reply_markup: {
-                inline_keyboard: [
-                    [
-                        { text: '✅ To‘landi', callback_data: `approveWithdraw_${chatId}` },
-                        { text: '❌ Bekor qilish', callback_data: `rejectWithdraw_${chatId}` }
-                    ]
-                ]
-            }
-        });
+🎮 1xBet ID:
+${state.betId}
 
-        userStates[chatId] = {};
+🔑 Kod:
+${state.cashCode}`,
+{
+    reply_markup: {
+        inline_keyboard: [
+            [
+                {
+                    text: '✅ To‘landi',
+                    callback_data: `approveWithdraw_${chatId}`
+                },
+                {
+                    text: '❌ Bekor qilish',
+                    callback_data: `rejectWithdraw_${chatId}`
+                }
+            ]
+        ]
+    }
+});
 
-        return bot.sendMessage(chatId,
+    userStates[chatId] = {};
+
+    return bot.sendMessage(chatId,
 `⏳ So‘rovingiz qabul qilindi.
 
-Tasdiqlangandan so‘ng 5–10 daqiqa ichida mablag‘ kartangizga tushadi.`);
-    }
-
+Tasdiqlangandan so‘ng 5–10 daqiqa ichida mablag‘ hisobingizga tushadi.`);
+}
     // ======================
     // SUPPORT
     // ======================
